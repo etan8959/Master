@@ -58,14 +58,14 @@ void drive_example() {
   // The third parameter is a boolean (true or false) for enabling/disabling a slew at the start of drive motions
   // for slew, only enable it when the drive distance is greater than the slew distance + a few inches
 
-  chassis.pid_drive_set(24_in, DRIVE_SPEED, true);
-  chassis.pid_wait();
+  chassisAuto.pid_drive_set(24_in, DRIVE_SPEED, true);
+  chassisAuto.pid_wait();
 
-  chassis.pid_drive_set(-12_in, DRIVE_SPEED);
-  chassis.pid_wait();
+  chassisAuto.pid_drive_set(-12_in, DRIVE_SPEED);
+  chassisAuto.pid_wait();
 
-  chassis.pid_drive_set(-12_in, DRIVE_SPEED);
-  chassis.pid_wait();
+  chassisAuto.pid_drive_set(-12_in, DRIVE_SPEED);
+  chassisAuto.pid_wait();
 }
 
 ///
@@ -382,21 +382,21 @@ void measure_offsets() {
 void theory_auton() {
   chassis.pid_drive_set(30_in, 127);
   chassis.pid_wait();
-  basket;
+  basket();
   chassis.pid_turn_set(60_deg, 127);
   chassis.pid_wait();
   chassis.pid_swing_set(ez::RIGHT_SWING, 20_deg, -127);
   chassis.pid_wait();
   chassis.pid_turn_set(90_deg, 127);
   chassis.pid_wait();
-  topp;
-  upward;
+  topp();
+  upward();
   chassis.pid_drive_set(-43_in, 127);
   chassis.pid_wait();
-  basket;
+  basket();
   chassis.pid_drive_set(43_in, 127);
   chassis.pid_wait();
-  upward;
+  upward();
 }
 
 void theory_auton2() {

@@ -75,8 +75,10 @@ void initialize() {
   });
 
   // Initialize chassis and auton selector
+  chassisAuto.initialize();
   chassis.initialize();
   ez::as::initialize();
+  master.rumble(chassisAuto.drive_imu_calibrated() ? "." : "---");
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
 }
 
@@ -114,11 +116,11 @@ void competition_initialize() {
  * from where it left off.
  */
 void autonomous() {
-  chassis.pid_targets_reset();                // Resets PID targets to 0
-  chassis.drive_imu_reset();                  // Reset gyro position to 0
-  chassis.drive_sensor_reset();               // Reset drive sensors to 0
-  chassis.odom_xyt_set(0_in, 0_in, 0_deg);    // Set the current position, you can start at a specific position with this
-  chassis.drive_brake_set(MOTOR_BRAKE_HOLD);  // Set motors to hold.  This helps autonomous consistency
+  chassisAuto.pid_targets_reset();                // Resets PID targets to 0
+  chassisAuto.drive_imu_reset();                  // Reset gyro position to 0
+  chassisAuto.drive_sensor_reset();               // Reset drive sensors to 0
+  chassisAuto.odom_xyt_set(0_in, 0_in, 0_deg);    // Set the current position, you can start at a specific position with this
+  chassisAuto.drive_brake_set(MOTOR_BRAKE_HOLD);  // Set motors to hold.  This helps autonomous consistency
 
 
   /*
@@ -248,6 +250,7 @@ void opcontrol() {
   bool jam = true;
   bool bottom = false;
   static bool ranAuton = false;
+  static bool testing = false;
    while (true) {
     ez_template_extras();
 
@@ -315,6 +318,10 @@ void opcontrol() {
     if (master.get_digital(DIGITAL_Y) && master.get_digital(DIGITAL_A) && !ranAuton) {
       autonomous();
       ranAuton = true;
+    }
+    if (master.get_digital(DIGITAL_Y) && master.get_digital(DIGITAL_X) && !testing) {
+      drive_example();
+      testing = true;
     }
 
     pros::delay(ez::util::DELAY_TIME);
