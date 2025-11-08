@@ -59,8 +59,8 @@ void initialize() {
 
   // Autonomous Selector using LLEMU
   ez::as::auton_selector.autons_add({
-      Auton{"Drive\n\nDrive forward and come back", theory_auton2},
-      Auton{"Drive and Turn\n\nDrive forward, turn, come back", theory_auton},
+      // Auton{"Drive\n\nDrive forward and come back", theory_auton2},
+      // Auton{"Drive and Turn\n\nDrive forward, turn, come back", theory_auton},
       // {"Drive and Turn\n\nSlow down during drive", wait_until_change_speed},
       // {"Swing Turn\n\nSwing in an 'S' curve", swing_example},
       // {"Motion Chaining\n\nDrive forward, turn, and come back, but blend everything together :D", motion_chaining},
@@ -273,25 +273,34 @@ void opcontrol() {
       global::middle.brake();
       global::top.brake();
       outtaking = false;
+      bottom = false;
     }
 
-    if(master.get_digital_new_press(DIGITAL_L1)) { //toggle function for top motor
-      if(outtaking) {
-        global::top.move_velocity(-200); //outtake in the middle
-        outtaking = false;
+    // if(master.get_digital_new_press(DIGITAL_L1)) { //toggle function for top motor
+    //   if(outtaking) {
+    //     global::top.move_velocity(-200); //outtake in the middle
+    //     outtaking = false;
+    //   }
+    //   else if(!outtaking) {
+    //     global::top.move_velocity(200); //outtake in the top
+    //     outtaking = true;
+    //   }
+      if(master.get_digital_new_press(DIGITAL_L2)) {
+        global::top.move_velocity(-200);
       }
-      else if(!outtaking) {
-        global::top.move_velocity(200); //outtake in the top
-        outtaking = true;
+      if(master.get_digital_new_press(DIGITAL_L1)) {
+        global::top.move_velocity(200);
       }
-    }
+
     if(master.get_digital_new_press(DIGITAL_X)) {
       if(!bottom){
-        grounded();
+        global::bottom.move_velocity(200);
+        global::middle.move_velocity(200);
         bottom = true;
       }
       if(bottom){
-        brake();
+        global::bottom.brake();
+        global::middle.brake();
         bottom = false;
       }
     }

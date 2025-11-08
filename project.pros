@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "10/27",
+    "project_name": "first comp",
     "target": "v5",
     "templates": {
       "EZ-Template": {
