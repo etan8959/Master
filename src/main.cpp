@@ -8,10 +8,10 @@
 // Chassis constructor
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
-    {11, 12},     // Left Chassis Ports (negative port will reverse it!)
-    {-18, -19},  // Right Chassis Ports (negative port will reverse it!)
+    {-11, -12},     // Left Chassis Ports (negative port will reverse it!)
+    {18, 19},  // Right Chassis Ports (negative port will reverse it!)
 
-    1,      // IMU Port
+    20,      // IMU Port
     3.5,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
     483);   // Wheel RPM = cartridge * (motor gear / wheel gear)
 
@@ -121,6 +121,11 @@ void autonomous() {
   chassisAuto.drive_sensor_reset();               // Reset drive sensors to 0
   chassisAuto.odom_xyt_set(0_in, 0_in, 0_deg);    // Set the current position, you can start at a specific position with this
   chassisAuto.drive_brake_set(MOTOR_BRAKE_HOLD);  // Set motors to hold.  This helps autonomous consistency
+  chassis.pid_targets_reset();
+  chassis.drive_imu_reset();
+  chassis.drive_sensor_reset();
+  chassis.odom_xyt_set(0_in, 0_in, 0_deg);
+  chassis.drive_brake_set(MOTOR_BRAKE_HOLD);
 
 
   /*
@@ -209,8 +214,8 @@ void ez_template_extras() {
     //  When enabled:
     //  * use A and Y to increment / decrement the constants
     //  * use the arrow keys to navigate the constants
-    if (master.get_digital_new_press(DIGITAL_X))
-      chassis.pid_tuner_toggle();
+    // if (master.get_digital_new_press(DIGITAL_X))
+    //   chassis.pid_tuner_toggle();
 
     // Trigger the selected autonomous routine
     if (master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_DOWN)) {
@@ -246,11 +251,20 @@ void ez_template_extras() {
 void opcontrol() {
   // This is preference to what you like to drive on
   chassis.drive_brake_set(MOTOR_BRAKE_HOLD);
-  bool outtaking = true;
-  bool jam = true;
-  bool bottom = false;
-  static bool ranAuton = false;
-  static bool testing = false;
+  static bool outtaking = true;
+  static bool jam = true;
+  static bool bottom = false;
+
+  //changing voltage to have motors more synced
+  // pros::Motor motor11(11);
+  // pros::Motor motor12(12);
+  // pros::Motor motor18(18);
+  // pros::Motor motor19(19);
+  // motor11.set_voltage_limit(12000);
+  // motor12.set_voltage_limit(12000);
+  // motor18.set_voltage_limit(10000);
+  // motor19.set_voltage_limit(10000);
+
    while (true) {
     ez_template_extras();
 
@@ -258,12 +272,12 @@ void opcontrol() {
     chassis.opcontrol_arcade_standard(ez::SPLIT);
 
     //intake control
-    if(master.get_digital_new_press(DIGITAL_R2)) { //makes it intake upward and out
+    if(master.get_digital_new_press(DIGITAL_R1)) { //makes it intake upward and out
       global::bottom.move_velocity(-200);
       global::middle.move_velocity(-200);
     }
 
-    if(master.get_digital_new_press(DIGITAL_R1)) { //makes it intake into the basket
+    if(master.get_digital_new_press(DIGITAL_R2)) { //makes it intake into the basket
       global::middle.move_velocity(200);
       global::bottom.move_velocity(-200);
     }
@@ -285,20 +299,20 @@ void opcontrol() {
     //     global::top.move_velocity(200); //outtake in the top
     //     outtaking = true;
     //   }
-      if(master.get_digital_new_press(DIGITAL_L2)) {
+      if(master.get_digital_new_press(DIGITAL_L1)) {
         global::top.move_velocity(-200);
       }
-      if(master.get_digital_new_press(DIGITAL_L1)) {
+      if(master.get_digital_new_press(DIGITAL_L2)) {
         global::top.move_velocity(200);
       }
 
     if(master.get_digital_new_press(DIGITAL_X)) {
-      if(!bottom){
+      if(!bottom) {
         global::bottom.move_velocity(200);
         global::middle.move_velocity(200);
         bottom = true;
       }
-      if(bottom){
+      else if(bottom) {
         global::bottom.brake();
         global::middle.brake();
         bottom = false;
@@ -324,13 +338,13 @@ void opcontrol() {
     }
 
   //AUTON
-    if (master.get_digital(DIGITAL_Y) && master.get_digital(DIGITAL_A) && !ranAuton) {
-      autonomous();
-      ranAuton = true;
-    }
-    if (master.get_digital(DIGITAL_Y) && master.get_digital(DIGITAL_X) && !testing) {
-      drive_example();
-      testing = true;
+    if(!pros::competition::is_connected()){
+      if(master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_LEFT)) {
+        theory_auton2();
+      }
+      if(master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_RIGHT)) {
+        theory_auton();
+      }
     }
 
     pros::delay(ez::util::DELAY_TIME);

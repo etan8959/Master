@@ -15,9 +15,9 @@ const int SWING_SPEED = 100;
 ///
 void default_constants() {
   // P, I, D, and Start I
-  chassisAuto.pid_drive_constants_set(2, 0.5, 1.2);
-  chassisAuto.pid_turn_constants_set(2, 0.2, 0.2, 15);   // Fwd/rev constants, start with proportional and derivative
-  chassisAuto.pid_heading_constants_set(5.0, 0.0, 5.0);          // Holds robot straight while driving
+  chassisAuto.pid_drive_constants_set(20.0, 0.0, 100.0);
+  chassisAuto.pid_turn_constants_set(3.0, 0.05, 20.0, 15.0);   // Fwd/rev constants, start with proportional and derivative
+  chassisAuto.pid_heading_constants_set(11.0, 0.0, 20.0);          // Holds robot straight while driving
   chassisAuto.pid_swing_constants_set(4.0, 0.0, 45.0);           // Swing constants, start medium tune
   chassisAuto.pid_odom_angular_constants_set(4.0, 0.0, 40.0);    // Angular control for odometry motions
   chassisAuto.pid_odom_boomerang_constants_set(4.0, 0.0, 25.0);  // Angular control for boomerang motions
@@ -401,7 +401,7 @@ void theory_auton() {
 
 void theory_auton2() {
   chassisAuto.drive_angle_set(45_deg);
-  chassisAuto.pid_drive_set(10_in, 50, false, true);
+  chassisAuto.pid_drive_set(10_in, 50, false);
   chassisAuto.pid_wait_quick();
   pros::delay(1000);
   basket();
