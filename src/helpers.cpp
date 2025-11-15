@@ -31,28 +31,25 @@ void brake() {
 }
 
 void upward() {
-  global::bottom.move_velocity(-200);
+  global::bottom.move_velocity(200);
   global::middle.move_velocity(-200);
 }
 
 void basket() {
   global::middle.move_velocity(200);
-  global::bottom.move_velocity(-200);
-}
-
-void uptaker() {
-  global::outtaker.move_absolute(-100, 100);
+  global::bottom.move_velocity(200);
 }
 
 void grounded() {
-  global::bottom.move_velocity(200);
+  global::bottom.move_velocity(-200);
   global::middle.move_velocity(200);
 }
 
 void middle() {
-  global::top.move_velocity(-200);
+  global::top.move_velocity(200);
 }
 
 void topp() {
-  global::top.move_velocity(200);
+  global::top.move_velocity(-200);
+  global::outtaker.move_velocity(-600);
 }

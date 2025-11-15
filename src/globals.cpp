@@ -10,7 +10,11 @@ pros::Motor middle(4, pros::v5::MotorGearset::rpm_200); //half
 pros::Motor top(7, pros::v5::MotorGearset::rpm_200);
 
 //other motors
-pros::Motor outtaker(6, pros::v5::MotorGearset::rpm_200); //half
+pros::Motor outtaker(10, pros::v5::MotorGearset::rpm_600);
 pros::Motor jammer(13, pros::v5::MotorGearset::rpm_200); //half
+
+//pneumatics
+pros::adi::Pneumatics descorer('A', false);
+pros::adi::Pneumatics match_loader('B', false);
 
 }

@@ -15,7 +15,7 @@ ez::Drive chassis(
     3.5,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
     483);   // Wheel RPM = cartridge * (motor gear / wheel gear)
 
-ez::Drive chassisAuto({11, 12}, {18, 19},  1, 3.5, 483);
+ez::Drive chassisAuto({-11, -12}, {18, 19},  1, 3.5, 483);
 // Uncomment the trackers  you're using here!
 // - `8` and `9` are smart ports (making these negative will reverse the sensor)
 //  - you should get positive values on the encoders going FORWARD and RIGHT
@@ -59,8 +59,8 @@ void initialize() {
 
   // Autonomous Selector using LLEMU
   ez::as::auton_selector.autons_add({
-      // Auton{"Drive\n\nDrive forward and come back", theory_auton2},
-      // Auton{"Drive and Turn\n\nDrive forward, turn, come back", theory_auton},
+      Auton{"left side", left_auton},
+      Auton{"right side", right_auton},
       // {"Drive and Turn\n\nSlow down during drive", wait_until_change_speed},
       // {"Swing Turn\n\nSwing in an 'S' curve", swing_example},
       // {"Motion Chaining\n\nDrive forward, turn, and come back, but blend everything together :D", motion_chaining},
@@ -254,8 +254,9 @@ void opcontrol() {
   static bool outtaking = true;
   static bool jam = true;
   static bool bottom = false;
+  static bool outting = false;
 
-  //changing voltage to have motors more synced
+  //changing voltage to have motors synced
   // pros::Motor motor11(11);
   // pros::Motor motor12(12);
   // pros::Motor motor18(18);
@@ -264,6 +265,7 @@ void opcontrol() {
   // motor12.set_voltage_limit(12000);
   // motor18.set_voltage_limit(10000);
   // motor19.set_voltage_limit(10000);
+  global::outtaker.set_voltage_limit(11000);
 
    while (true) {
     ez_template_extras();
@@ -273,43 +275,37 @@ void opcontrol() {
 
     //intake control
     if(master.get_digital_new_press(DIGITAL_R1)) { //makes it intake upward and out
-      global::bottom.move_velocity(-200);
+      global::bottom.move_velocity(200);
       global::middle.move_velocity(-200);
     }
 
     if(master.get_digital_new_press(DIGITAL_R2)) { //makes it intake into the basket
       global::middle.move_velocity(200);
-      global::bottom.move_velocity(-200);
+      global::bottom.move_velocity(200);
     }
     
     if(master.get_digital_new_press(DIGITAL_A)) { //stops all outtaking and intaking systems
       global::bottom.brake();
       global::middle.brake();
       global::top.brake();
+      global::outtaker.brake();
       outtaking = false;
       bottom = false;
     }
 
-    // if(master.get_digital_new_press(DIGITAL_L1)) { //toggle function for top motor
-    //   if(outtaking) {
-    //     global::top.move_velocity(-200); //outtake in the middle
-    //     outtaking = false;
-    //   }
-    //   else if(!outtaking) {
-    //     global::top.move_velocity(200); //outtake in the top
-    //     outtaking = true;
-    //   }
       if(master.get_digital_new_press(DIGITAL_L1)) {
         global::top.move_velocity(-200);
+        global::outtaker.move_velocity(-600);
       }
       if(master.get_digital_new_press(DIGITAL_L2)) {
         global::top.move_velocity(200);
+        global::outtaker.brake();
       }
 
     if(master.get_digital_new_press(DIGITAL_X)) {
       if(!bottom) {
-        global::bottom.move_velocity(200);
-        global::middle.move_velocity(200);
+        global::bottom.move_velocity(-200);
+        global::middle.move_velocity(-200);
         bottom = true;
       }
       else if(bottom) {
@@ -318,12 +314,10 @@ void opcontrol() {
         bottom = false;
       }
     }
-    if(master.get_digital_new_press(DIGITAL_B)) { //moves the outtaker up
-      global::outtaker.move_absolute(-100, 100);
-    }
+
 
     if(master.get_digital_new_press(DIGITAL_UP)) { //toggle function for anti-jammer
-      if (jam) {
+      if(jam) {
         global::jammer.move_velocity(-200); //normal
         jam = false;
       }
@@ -337,16 +331,42 @@ void opcontrol() {
       global::jammer.brake();
     }
 
+    if(master.get_digital_new_press(DIGITAL_LEFT)) {
+      global::descorer.toggle();
+    }
+
+    if(master.get_digital_new_press(DIGITAL_Y)) { //toggle match loader pneumatics
+      global::match_loader.toggle();
+    }
   //AUTON
     if(!pros::competition::is_connected()){
       if(master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_LEFT)) {
-        theory_auton2();
+        left_auton();
       }
       if(master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_RIGHT)) {
-        theory_auton();
+        right_auton();
       }
-    }
 
+//old controls
+    // if(master.get_digital_new_press(DIGITAL_L1)) { //toggle function for top motor
+    //   if(outtaking) {
+    //     global::top.move_velocity(-200); //outtake in the middle
+    //     outtaking = false;
+    //   }
+    //   else if(!outtaking) {
+    //     global::top.move_velocity(200); //outtake in the top
+    //     outtaking = true;
+    //   }
+
+    // if(master.get_digital_new_press(DIGITAL_B)) { //toggle function for outtaking wheels
+    //   if(!outting) {
+    //   global::outtaker.move_velocity(-200); //outtaking
+    //   }
+    //   if(outting) {
+    //   global::outtaker.brake(); //brakes
+    //   }
+    // }    
+    }
     pros::delay(ez::util::DELAY_TIME);
   }
 
