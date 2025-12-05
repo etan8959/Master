@@ -14,4 +14,6 @@ extern pros::Motor jammer;
 extern pros::adi::Pneumatics descorer;
 extern pros::adi::Pneumatics match_loader;
 
+extern pros::Optical color;
+
 };

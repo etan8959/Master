@@ -380,6 +380,14 @@ void measure_offsets() {
 // . . .
 
 void right_auton() {
+static bool team_color = false;		//false is red and true is blue
+
+if( 0 < global::color.get_hue() && global::color.get_hue() < 70) {
+	team_color = false;		//set color to red if it starts seeing red
+}
+else if(150 < global::color.get_hue() && global::color.get_hue() < 270) {
+	team_color = true;		// set color to blue if it starts seeing blue
+}
   basket();
   chassis.pid_drive_set(12_in, 60, false);
   chassis.pid_wait();
@@ -391,7 +399,7 @@ void right_auton() {
   chassis.pid_turn_relative_set(88_deg, 60, false);
   chassis.pid_wait();
   pros::delay(100);
-  chassis.pid_drive_set(33_in, 60, false);
+  chassis.pid_drive_set(33.5_in, 60, false);
   chassis.pid_wait();
   chassis.pid_turn_relative_set(-129_deg, 60, false);
   chassis.pid_wait();
@@ -429,6 +437,15 @@ void right_auton() {
 }
 
 void left_auton() {
+static bool team_color = false;		//false is red and true is blue
+
+if( 0 < global::color.get_hue() && global::color.get_hue() < 70) {
+	team_color = false;		//set color to red if it starts seeing red
+}
+else if(150 < global::color.get_hue() && global::color.get_hue() < 270) {
+	team_color = true;		// set color to blue if it starts seeing blue
+}
+
   basket();
   chassis.pid_drive_set(12_in, 60, false);
   chassis.pid_wait();

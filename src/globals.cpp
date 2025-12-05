@@ -17,4 +17,7 @@ pros::Motor jammer(13, pros::v5::MotorGearset::rpm_200); //half
 pros::adi::Pneumatics descorer('A', false);
 pros::adi::Pneumatics match_loader('B', false);
 
+//theory color code
+pros::Optical color(2);
+
 }

@@ -8,12 +8,14 @@
 // Chassis constructor
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
-    {-11, -12},     // Left Chassis Ports (negative port will reverse it!)
-    {18, 19},  // Right Chassis Ports (negative port will reverse it!)
+    {11, -12, -13},     // Left Chassis Ports (negative port will reverse it!)
+    {-18, 19, 20},  // Right Chassis Ports (negative port will reverse it!)
 
     20,      // IMU Port
     3.5,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
     483);   // Wheel RPM = cartridge * (motor gear / wheel gear)
+
+    static bool team_color = false; // false is red, true is blue
 
 ez::Drive chassisAuto({-11, -12}, {18, 19},  1, 3.5, 483);
 // Uncomment the trackers  you're using here!
@@ -235,6 +237,46 @@ void ez_template_extras() {
   }
 }
 
+//testing color code
+// bool color_sensor = false;
+// void color() {
+//   // Display proximity and hue values on the LCD screen
+//   pros::lcd::set_text(2, std::to_string(global::color.get_proximity()));
+//   pros::lcd::set_text(3, std::to_string(global::color.get_hue()));
+
+//   // Check if the color sensor should be activated
+//   if (color_sensor || master.get_digital_new_press(DIGITAL_RIGHT)) {
+//     color_sensor = true;             // Activate the color sensor
+//     global::color.set_led_pwm(100);  // Turn on the LED for the color sensor
+
+//     // Retrieve hue and proximity values from the sensor
+//     int hue = global::color.get_hue();
+//     // int proximity = global::color.get_proximity();
+
+//     // Handle object detection and actions based on the team configuration
+//     if (team_color && !(70 < hue && hue < 270)) {
+//       global::top.move_velocity(200);
+//       // global::outtaker.move_velocity(-600);
+//     } else if (!team_color && !(hue < 10)) {
+//       global::top.move_velocity(200);     // Move the scores the middle
+//       // global::outtaker.brake();
+//   }  else {
+//       global::top.move_velocity(200);     // Stop the top motor
+//       global::color.set_led_pwm(0);  // Turn off the LED
+//       // color_sensor = false;          // Deactivate the color sensor
+//     }
+//   }
+
+//     if (color_sensor && master.get_digital_new_press(DIGITAL_LEFT)) {
+//     global::top.brake();     // Stop the top motor
+//     global::middle.brake();  // Stop the middle motor
+//     global::bottom.brake();  // Stop the bottom motor
+//     color_sensor = false;          // Deactivate the color sensor
+//     global::color.set_led_pwm(0);  // Turn off the LED
+//   }
+
+// }
+//end testing color code
 /**
  * Runs the operator control code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
@@ -255,20 +297,23 @@ void opcontrol() {
   static bool jam = true;
   static bool bottom = false;
   static bool outting = false;
+  static bool color_sort = false;		//toggle variable for color sorting mode
 
   //changing voltage to have motors synced
   // pros::Motor motor11(11);
   // pros::Motor motor12(12);
   // pros::Motor motor18(18);
   // pros::Motor motor19(19);
-  // motor11.set_voltage_limit(12000);
-  // motor12.set_voltage_limit(12000);
-  // motor18.set_voltage_limit(10000);
-  // motor19.set_voltage_limit(10000);
+  // motor11.set_voltage_limit(11000);
+  // motor12.set_voltage_limit(11000);
+  // motor18.set_voltage_limit(11000);
+  // motor19.set_voltage_limit(11000);
   global::outtaker.set_voltage_limit(11000);
 
    while (true) {
     ez_template_extras();
+
+    int hue = global::color.get_hue();		//get value of color sensor constantly
 
     // Use flipped arcade control - this swaps X and Y automatically
     chassis.opcontrol_arcade_standard(ez::SPLIT);
@@ -293,11 +338,33 @@ void opcontrol() {
       bottom = false;
     }
 
-      if(master.get_digital_new_press(DIGITAL_L1)) {
-        global::top.move_velocity(-200);
-        global::outtaker.move_velocity(-600);
-      }
-      if(master.get_digital_new_press(DIGITAL_L2)) {
+  if(master.get_digital_new_press(DIGITAL_LEFT)) {	//toggling color sort
+	color_sort = !color_sort;
+}
+
+if(master.get_digital_new_press(DIGITAL_L1)) {
+	if(team_color && color_sort) {			//if color sort is on and color is blue
+		if(150 < hue && hue < 270) {
+			global::top.move_velocity(-200);	//if color detected is blue then top goal
+		}
+		else if(0 < hue && hue < 70) {
+			global::top.move_velocity(200);	//if color detected is red then middle goal
+		}
+	}
+	else if(!team_color && color_sort) {		//if color sort is on and color is red
+		if(0 < hue && hue < 70) {
+			global::top.move_velocity(-200);	//if color detected is red then top goal
+		}
+		else if(150 < hue && hue < 270) {
+			global::top.move_velocity(200);	//if color detected is blue then middle goal
+		}
+	}
+	else if(!color_sort) {
+		global::top.move_velocity(-200);		//normal without color sorting
+	}
+}
+
+      if(master.get_digital_new_press(DIGITAL_L2)) { //middle goal outtake
         global::top.move_velocity(200);
         global::outtaker.brake();
       }
