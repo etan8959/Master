@@ -382,12 +382,12 @@ void measure_offsets() {
 void right_auton() {
 static bool team_color = false;		//false is red and true is blue
 
-if( 0 < global::color.get_hue() && global::color.get_hue() < 70) {
-	team_color = false;		//set color to red if it starts seeing red
-}
-else if(150 < global::color.get_hue() && global::color.get_hue() < 270) {
-	team_color = true;		// set color to blue if it starts seeing blue
-}
+// if( 0 < global::color.get_hue() && global::color.get_hue() < 70) {
+// 	team_color = false;		//set color to red if it starts seeing red
+// }
+// else if(150 < global::color.get_hue() && global::color.get_hue() < 270) {
+// 	team_color = true;		// set color to blue if it starts seeing blue
+// }
   basket();
   chassis.pid_drive_set(12_in, 60, false);
   chassis.pid_wait();
@@ -407,7 +407,7 @@ else if(150 < global::color.get_hue() && global::color.get_hue() < 270) {
   chassis.pid_wait();
   chassis.pid_drive_set(-1.5_in, 50, false);
   chassis.pid_wait();
-  global::jammer.move_velocity(200);
+  global::jammer.move_velocity(-200);
   upward();
   topp();
   global::jammer.move_velocity(-200);
@@ -439,12 +439,12 @@ else if(150 < global::color.get_hue() && global::color.get_hue() < 270) {
 void left_auton() {
 static bool team_color = false;		//false is red and true is blue
 
-if( 0 < global::color.get_hue() && global::color.get_hue() < 70) {
-	team_color = false;		//set color to red if it starts seeing red
-}
-else if(150 < global::color.get_hue() && global::color.get_hue() < 270) {
-	team_color = true;		// set color to blue if it starts seeing blue
-}
+// if( 0 < global::color.get_hue() && global::color.get_hue() < 70) {
+// 	team_color = false;		//set color to red if it starts seeing red
+// }
+// else if(150 < global::color.get_hue() && global::color.get_hue() < 270) {
+// 	team_color = true;		// set color to blue if it starts seeing blue
+// }
 
   basket();
   chassis.pid_drive_set(12_in, 60, false);
@@ -465,7 +465,7 @@ else if(150 < global::color.get_hue() && global::color.get_hue() < 270) {
   chassis.pid_wait();
   chassis.pid_drive_set(-1.5_in, 50, false);
   chassis.pid_wait();
-  global::jammer.move_velocity(200);
+  global::jammer.move_velocity(-200);
   upward();
   topp();
   global::jammer.move_velocity(-200);
@@ -514,4 +514,10 @@ else if(150 < global::color.get_hue() && global::color.get_hue() < 270) {
   // global::jammer.move_velocity(200);
   // pros::delay(1500);
   // global::jammer.move_velocity(-200);
+}
+
+void forwards() {
+  chassis.pid_drive_set(5_in, 100, false);
+  chassis.pid_wait();
+  pros::delay(10000000);
 }

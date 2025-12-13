@@ -11,6 +11,7 @@ extern pros::Motor top;
 extern pros::Motor outtaker;
 extern pros::Motor jammer;
 
+extern pros::adi::Pneumatics sorter;
 extern pros::adi::Pneumatics descorer;
 extern pros::adi::Pneumatics match_loader;
 

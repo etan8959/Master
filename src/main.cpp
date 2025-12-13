@@ -8,10 +8,10 @@
 // Chassis constructor
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
-    {11, -12, -13},     // Left Chassis Ports (negative port will reverse it!)
-    {-18, 19, 20},  // Right Chassis Ports (negative port will reverse it!)
+    {-11, 12, 13},     // Left Chassis Ports (negative port will reverse it!)
+    {18, -19, -20},  // Right Chassis Ports (negative port will reverse it!)
 
-    20,      // IMU Port
+    17,      // IMU Port
     3.5,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
     483);   // Wheel RPM = cartridge * (motor gear / wheel gear)
 
@@ -61,8 +61,9 @@ void initialize() {
 
   // Autonomous Selector using LLEMU
   ez::as::auton_selector.autons_add({
-      Auton{"left side", left_auton},
-      Auton{"right side", right_auton},
+      Auton{"left side auton, 4 blocks", left_auton},
+      Auton{"right side auton, 4 blocks", right_auton},
+      Auton{"forward 5 inches", forwards},
       // {"Drive and Turn\n\nSlow down during drive", wait_until_change_speed},
       // {"Swing Turn\n\nSwing in an 'S' curve", swing_example},
       // {"Motion Chaining\n\nDrive forward, turn, and come back, but blend everything together :D", motion_chaining},
@@ -243,16 +244,13 @@ void ez_template_extras() {
 //   // Display proximity and hue values on the LCD screen
 //   pros::lcd::set_text(2, std::to_string(global::color.get_proximity()));
 //   pros::lcd::set_text(3, std::to_string(global::color.get_hue()));
-
 //   // Check if the color sensor should be activated
 //   if (color_sensor || master.get_digital_new_press(DIGITAL_RIGHT)) {
 //     color_sensor = true;             // Activate the color sensor
 //     global::color.set_led_pwm(100);  // Turn on the LED for the color sensor
-
 //     // Retrieve hue and proximity values from the sensor
 //     int hue = global::color.get_hue();
 //     // int proximity = global::color.get_proximity();
-
 //     // Handle object detection and actions based on the team configuration
 //     if (team_color && !(70 < hue && hue < 270)) {
 //       global::top.move_velocity(200);
@@ -266,7 +264,6 @@ void ez_template_extras() {
 //       // color_sensor = false;          // Deactivate the color sensor
 //     }
 //   }
-
 //     if (color_sensor && master.get_digital_new_press(DIGITAL_LEFT)) {
 //     global::top.brake();     // Stop the top motor
 //     global::middle.brake();  // Stop the middle motor
@@ -274,7 +271,6 @@ void ez_template_extras() {
 //     color_sensor = false;          // Deactivate the color sensor
 //     global::color.set_led_pwm(0);  // Turn off the LED
 //   }
-
 // }
 //end testing color code
 /**
@@ -321,12 +317,14 @@ void opcontrol() {
     //intake control
     if(master.get_digital_new_press(DIGITAL_R1)) { //makes it intake upward and out
       global::bottom.move_velocity(200);
-      global::middle.move_velocity(-200);
+      global::middle.move_velocity(200);
+      global::sorter.extend();
     }
 
     if(master.get_digital_new_press(DIGITAL_R2)) { //makes it intake into the basket
       global::middle.move_velocity(200);
       global::bottom.move_velocity(200);
+      global::sorter.retract();
     }
     
     if(master.get_digital_new_press(DIGITAL_A)) { //stops all outtaking and intaking systems
@@ -338,41 +336,43 @@ void opcontrol() {
       bottom = false;
     }
 
-  if(master.get_digital_new_press(DIGITAL_LEFT)) {	//toggling color sort
-	color_sort = !color_sort;
-}
+//   if(master.get_digital_new_press(DIGITAL_LEFT)) {	//toggling color sort
+// 	color_sort = !color_sort;
+// }
 
 if(master.get_digital_new_press(DIGITAL_L1)) {
-	if(team_color && color_sort) {			//if color sort is on and color is blue
-		if(150 < hue && hue < 270) {
-			global::top.move_velocity(-200);	//if color detected is blue then top goal
-		}
-		else if(0 < hue && hue < 70) {
-			global::top.move_velocity(200);	//if color detected is red then middle goal
-		}
-	}
-	else if(!team_color && color_sort) {		//if color sort is on and color is red
-		if(0 < hue && hue < 70) {
-			global::top.move_velocity(-200);	//if color detected is red then top goal
-		}
-		else if(150 < hue && hue < 270) {
-			global::top.move_velocity(200);	//if color detected is blue then middle goal
-		}
-	}
-	else if(!color_sort) {
-		global::top.move_velocity(-200);		//normal without color sorting
-	}
+	// if(team_color && color_sort) {			//if color sort is on and color is blue
+	// 	if(150 < hue && hue < 270) {
+	// 		global::top.move_velocity(-200);	//if color detected is blue then top goal
+	// 	}
+	// 	else if(0 < hue && hue < 70) {
+	// 		global::top.move_velocity(200);	//if color detected is red then middle goal
+	// 	}
+	// }
+	// else if(!team_color && color_sort) {		//if color sort is on and color is red
+	// 	if(0 < hue && hue < 70) {
+	// 		global::top.move_velocity(-200);	//if color detected is red then top goal
+	// 	}
+	// 	else if(150 < hue && hue < 270) {
+	// 		global::top.move_velocity(200);	//if color detected is blue then middle goal
+	// 	}
+	// }
+	// else if(!color_sort) {
+		global::top.move_velocity(200);		//normal without color sorting
+    global::bottom.move_velocity(200);
+	// }
 }
 
       if(master.get_digital_new_press(DIGITAL_L2)) { //middle goal outtake
-        global::top.move_velocity(200);
+        global::top.move_velocity(-200);
+        global::bottom.move_velocity(-200);
         global::outtaker.brake();
       }
 
     if(master.get_digital_new_press(DIGITAL_X)) {
       if(!bottom) {
         global::bottom.move_velocity(-200);
-        global::middle.move_velocity(-200);
+        global::middle.move_velocity(200);
         bottom = true;
       }
       else if(bottom) {
@@ -385,11 +385,11 @@ if(master.get_digital_new_press(DIGITAL_L1)) {
 
     if(master.get_digital_new_press(DIGITAL_UP)) { //toggle function for anti-jammer
       if(jam) {
-        global::jammer.move_velocity(-200); //normal
+        global::jammer.move_velocity(200); //stay in basket
         jam = false;
       }
       else if(!jam) {
-        global::jammer.move_velocity(200); //reversed
+        global::jammer.move_velocity(-200); //out of basket
         jam = true;
       }
     }
