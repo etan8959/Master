@@ -10,9 +10,6 @@ pros::Motor middle(4, pros::v5::MotorGearset::rpm_200); //half
 pros::Motor top(7, pros::v5::MotorGearset::rpm_200); //half
 pros::Motor jammer(15, pros::v5::MotorGearset::rpm_200); //half
 
-//other motors
-pros::Motor outtaker(10, pros::v5::MotorGearset::rpm_600);
-
 //pneumatics
 pros::adi::Pneumatics sorter('g', false); //starts retracted
 pros::adi::Pneumatics descorer('f', false); //starts retracted

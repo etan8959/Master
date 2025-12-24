@@ -11,13 +11,13 @@ ez::Drive chassis(
     {-11, 12, 13},     // Left Chassis Ports (negative port will reverse it!)
     {18, -19, -20},  // Right Chassis Ports (negative port will reverse it!)
 
-    17,      // IMU Port
+    14,      // IMU Port
     3.5,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
     483);   // Wheel RPM = cartridge * (motor gear / wheel gear)
 
     static bool team_color = false; // false is red, true is blue
 
-ez::Drive chassisAuto({-11, -12}, {18, 19},  1, 3.5, 483);
+ez::Drive chassisAuto({11, -12, 13}, {-18, 19, 20},  14, 3.5, 483);
 // Uncomment the trackers  you're using here!
 // - `8` and `9` are smart ports (making these negative will reverse the sensor)
 //  - you should get positive values on the encoders going FORWARD and RIGHT
@@ -81,7 +81,6 @@ void initialize() {
   chassisAuto.initialize();
   chassis.initialize();
   ez::as::initialize();
-  master.rumble(chassisAuto.drive_imu_calibrated() ? "." : "---");
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
 }
 
@@ -221,11 +220,11 @@ void ez_template_extras() {
     //   chassis.pid_tuner_toggle();
 
     // Trigger the selected autonomous routine
-    if (master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_DOWN)) {
-      pros::motor_brake_mode_e_t preference = chassis.drive_brake_get();
-      autonomous();
-      chassis.drive_brake_set(preference);
-    }
+    // if (master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_DOWN)) {
+    //   pros::motor_brake_mode_e_t preference = chassis.drive_brake_get();
+    //   autonomous();
+    //   chassis.drive_brake_set(preference);
+    // }
 
     // Allow PID Tuner to iterate
     chassis.pid_tuner_iterate();
@@ -294,6 +293,7 @@ void opcontrol() {
   static bool bottom = false;
   static bool outting = false;
   static bool color_sort = false;		//toggle variable for color sorting mode
+  bool yes = false;
 
   //changing voltage to have motors synced
   // pros::Motor motor11(11);
@@ -304,7 +304,7 @@ void opcontrol() {
   // motor12.set_voltage_limit(11000);
   // motor18.set_voltage_limit(11000);
   // motor19.set_voltage_limit(11000);
-  global::outtaker.set_voltage_limit(11000);
+  // global::outtaker.set_voltage_limit(11000);
 
    while (true) {
     ez_template_extras();
@@ -312,26 +312,25 @@ void opcontrol() {
     int hue = global::color.get_hue();		//get value of color sensor constantly
 
     // Use flipped arcade control - this swaps X and Y automatically
-    chassis.opcontrol_arcade_standard(ez::SPLIT);
+    chassis.opcontrol_tank();
 
     //intake control
     if(master.get_digital_new_press(DIGITAL_R1)) { //makes it intake upward and out
       global::bottom.move_velocity(200);
       global::middle.move_velocity(200);
-      global::sorter.extend();
+      global::sorter.retract();
     }
 
     if(master.get_digital_new_press(DIGITAL_R2)) { //makes it intake into the basket
       global::middle.move_velocity(200);
       global::bottom.move_velocity(200);
-      global::sorter.retract();
+      global::sorter.extend();
     }
     
     if(master.get_digital_new_press(DIGITAL_A)) { //stops all outtaking and intaking systems
       global::bottom.brake();
       global::middle.brake();
       global::top.brake();
-      global::outtaker.brake();
       outtaking = false;
       bottom = false;
     }
@@ -366,10 +365,9 @@ if(master.get_digital_new_press(DIGITAL_L1)) {
       if(master.get_digital_new_press(DIGITAL_L2)) { //middle goal outtake
         global::top.move_velocity(-200);
         global::bottom.move_velocity(-200);
-        global::outtaker.brake();
       }
 
-    if(master.get_digital_new_press(DIGITAL_X)) {
+    if(master.get_digital_new_press(DIGITAL_X)) { //bottom goal
       if(!bottom) {
         global::bottom.move_velocity(-200);
         global::middle.move_velocity(200);
@@ -398,7 +396,7 @@ if(master.get_digital_new_press(DIGITAL_L1)) {
       global::jammer.brake();
     }
 
-    if(master.get_digital_new_press(DIGITAL_LEFT)) {
+    if(master.get_digital_new_press(DIGITAL_LEFT)) { //descorer
       global::descorer.toggle();
     }
 
@@ -406,35 +404,23 @@ if(master.get_digital_new_press(DIGITAL_L1)) {
       global::match_loader.toggle();
     }
   //AUTON
-    if(!pros::competition::is_connected()){
+    
       if(master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_LEFT)) {
         left_auton();
       }
       if(master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_RIGHT)) {
         right_auton();
       }
-
-//old controls
-    // if(master.get_digital_new_press(DIGITAL_L1)) { //toggle function for top motor
-    //   if(outtaking) {
-    //     global::top.move_velocity(-200); //outtake in the middle
-    //     outtaking = false;
-    //   }
-    //   else if(!outtaking) {
-    //     global::top.move_velocity(200); //outtake in the top
-    //     outtaking = true;
-    //   }
-
-    // if(master.get_digital_new_press(DIGITAL_B)) { //toggle function for outtaking wheels
-    //   if(!outting) {
-    //   global::outtaker.move_velocity(-200); //outtaking
-    //   }
-    //   if(outting) {
-    //   global::outtaker.brake(); //brakes
-    //   }
-    // }    
-    }
-    pros::delay(ez::util::DELAY_TIME);
+      if(master.get_digital_new_press(DIGITAL_B) && master.get_digital_new_press(DIGITAL_DOWN)) {
+        if(yes) {
+          chassisAuto.pid_drive_set(10_in, 100, false);
+          yes = false;
+        }
+        else if(!yes) {
+          chassisAuto.pid_drive_set(10_in, 100, false);
+          yes = true;
+        }
+      }   
   }
 
 }

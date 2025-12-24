@@ -15,37 +15,37 @@ const int SWING_SPEED = 100;
 ///
 void default_constants() {
   // P, I, D, and Start I
-  chassisAuto.pid_drive_constants_set(20.0, 0.0, 100.0);
-  chassisAuto.pid_turn_constants_set(3.0, 0.05, 20.0, 15.0);   // Fwd/rev constants, start with proportional and derivative
-  chassisAuto.pid_heading_constants_set(11.0, 0.0, 20.0);          // Holds robot straight while driving
-  chassisAuto.pid_swing_constants_set(4.0, 0.0, 45.0);           // Swing constants, start medium tune
-  chassisAuto.pid_odom_angular_constants_set(4.0, 0.0, 40.0);    // Angular control for odometry motions
-  chassisAuto.pid_odom_boomerang_constants_set(4.0, 0.0, 25.0);  // Angular control for boomerang motions
+  chassis.pid_drive_constants_set(20.0, 0.0, 100.0);
+  chassis.pid_turn_constants_set(3.0, 0.05, 20.0, 15.0);   // Fwd/rev constants, start with proportional and derivative
+  chassis.pid_heading_constants_set(11.0, 0.0, 20.0);          // Holds robot straight while driving
+  chassis.pid_swing_constants_set(4.0, 0.0, 45.0);           // Swing constants, start medium tune
+  chassis.pid_odom_angular_constants_set(4.0, 0.0, 40.0);    // Angular control for odometry motions
+  chassis.pid_odom_boomerang_constants_set(4.0, 0.0, 25.0);  // Angular control for boomerang motions
 
   // Exit conditions
-  chassisAuto.pid_turn_exit_condition_set(90_ms, 3_deg, 250_ms, 7_deg, 500_ms, 500_ms);
-  chassisAuto.pid_swing_exit_condition_set(90_ms, 3_deg, 250_ms, 7_deg, 500_ms, 500_ms);
-  chassisAuto.pid_drive_exit_condition_set(90_ms, 1_in, 250_ms, 3_in, 500_ms, 500_ms);
-  chassisAuto.pid_odom_turn_exit_condition_set(90_ms, 3_deg, 250_ms, 7_deg, 500_ms, 750_ms);
-  chassisAuto.pid_odom_drive_exit_condition_set(90_ms, 1_in, 250_ms, 3_in, 500_ms, 750_ms);
-  chassisAuto.pid_turn_chain_constant_set(3_deg);
-  chassisAuto.pid_swing_chain_constant_set(5_deg);
-  chassisAuto.pid_drive_chain_constant_set(3_in);
+  chassis.pid_turn_exit_condition_set(90_ms, 3_deg, 250_ms, 7_deg, 500_ms, 500_ms);
+  chassis.pid_swing_exit_condition_set(90_ms, 3_deg, 250_ms, 7_deg, 500_ms, 500_ms);
+  chassis.pid_drive_exit_condition_set(90_ms, 1_in, 250_ms, 3_in, 500_ms, 500_ms);
+  chassis.pid_odom_turn_exit_condition_set(90_ms, 3_deg, 250_ms, 7_deg, 500_ms, 750_ms);
+  chassis.pid_odom_drive_exit_condition_set(90_ms, 1_in, 250_ms, 3_in, 500_ms, 750_ms);
+  chassis.pid_turn_chain_constant_set(3_deg);
+  chassis.pid_swing_chain_constant_set(5_deg);
+  chassis.pid_drive_chain_constant_set(3_in);
 
   // Slew constants
-  chassisAuto.slew_turn_constants_set(3_deg, 70);
-  chassisAuto.slew_drive_constants_set(3_in, 70);
-  chassisAuto.slew_swing_constants_set(3_in, 80);
+  chassis.slew_turn_constants_set(3_deg, 70);
+  chassis.slew_drive_constants_set(3_in, 70);
+  chassis.slew_swing_constants_set(3_in, 80);
 
   // Turn priority during odometry (higher means turning prioritized more)
-  chassisAuto.odom_turn_bias_set(0.9);
+  chassis.odom_turn_bias_set(0.9);
 
-  chassisAuto.odom_look_ahead_set(7_in);           // How far ahead robot looks on path
-  chassisAuto.odom_boomerang_distance_set(16_in);  // Max dist away from target for boomerang
-  chassisAuto.odom_boomerang_dlead_set(0.625);      // Aggressiveness of boomerang end
+  chassis.odom_look_ahead_set(7_in);           // How far ahead robot looks on path
+  chassis.odom_boomerang_distance_set(16_in);  // Max dist away from target for boomerang
+  chassis.odom_boomerang_dlead_set(0.625);      // Aggressiveness of boomerang end
 
   // Behavior for angle wrapping (turn shortest path)
-  chassisAuto.pid_angle_behavior_set(ez::shortest);
+  chassis.pid_angle_behavior_set(ez::shortest);
 }
 
 
@@ -517,7 +517,7 @@ static bool team_color = false;		//false is red and true is blue
 }
 
 void forwards() {
-  chassis.pid_drive_set(5_in, 100, false);
+  chassis.pid_drive_set(10_in, 100, false);
   chassis.pid_wait();
   pros::delay(10000000);
 }

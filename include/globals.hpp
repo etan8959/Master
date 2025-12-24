@@ -8,7 +8,6 @@ namespace global{
 extern pros::Motor bottom;
 extern pros::Motor middle;
 extern pros::Motor top;
-extern pros::Motor outtaker;
 extern pros::Motor jammer;
 
 extern pros::adi::Pneumatics sorter;

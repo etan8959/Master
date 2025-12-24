@@ -11,16 +11,17 @@ void brake() {
 }
 
 void upward() {
+  global::jammer.move_velocity(-200);
   global::bottom.move_velocity(200);
   global::middle.move_velocity(-200);
   global::sorter.extend();
 }
 
 void basket() {
+  global::jammer.move_velocity(200);
   global::middle.move_velocity(200);
   global::bottom.move_velocity(200);
   global::sorter.retract();
-  global::jammer.move_velocity(200);
 }
 
 void grounded() {
