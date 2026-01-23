@@ -7,13 +7,13 @@ namespace global{
 //intaking and outtaking systems
 pros::Motor bottom(-3, pros::v5::MotorGearset::rpm_200); //half
 pros::Motor middle(4, pros::v5::MotorGearset::rpm_200); //half
-pros::Motor top(7, pros::v5::MotorGearset::rpm_200); //half
-pros::Motor jammer(15, pros::v5::MotorGearset::rpm_200); //half
+pros::Motor top(6, pros::v5::MotorGearset::rpm_200); //half
+pros::Motor jammer(5, pros::v5::MotorGearset::rpm_200); //half
 
 //pneumatics
-pros::adi::Pneumatics sorter('g', false); //starts retracted
+pros::adi::Pneumatics sorter('h', false); //starts retracted
 pros::adi::Pneumatics descorer('f', false); //starts retracted
-pros::adi::Pneumatics match_loader('h', false); //starts retracted
+pros::adi::Pneumatics match_loader('g', false); //starts retracted
 
 //theory color code
 pros::Optical color(2);

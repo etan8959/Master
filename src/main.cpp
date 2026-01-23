@@ -8,10 +8,10 @@
 // Chassis constructor
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
-    {-11, 12, 13},     // Left Chassis Ports (negative port will reverse it!)
-    {18, -19, -20},  // Right Chassis Ports (negative port will reverse it!)
+    {-19, -20},     // Left Chassis Ports (negative port will reverse it!)
+    {7, 8},  // Right Chassis Ports (negative port will reverse it!)
 
-    14,      // IMU Port
+    10,      // IMU Port
     3.5,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
     483);   // Wheel RPM = cartridge * (motor gear / wheel gear)
 
@@ -78,7 +78,6 @@ void initialize() {
   });
 
   // Initialize chassis and auton selector
-  chassisAuto.initialize();
   chassis.initialize();
   ez::as::initialize();
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
@@ -285,6 +284,7 @@ void ez_template_extras() {
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
+
 void opcontrol() {
   // This is preference to what you like to drive on
   chassis.drive_brake_set(MOTOR_BRAKE_HOLD);
@@ -296,14 +296,14 @@ void opcontrol() {
   bool yes = false;
 
   //changing voltage to have motors synced
-  // pros::Motor motor11(11);
-  // pros::Motor motor12(12);
-  // pros::Motor motor18(18);
-  // pros::Motor motor19(19);
-  // motor11.set_voltage_limit(11000);
-  // motor12.set_voltage_limit(11000);
-  // motor18.set_voltage_limit(11000);
-  // motor19.set_voltage_limit(11000);
+  pros::Motor motor7(7);
+  pros::Motor motor8(8);
+  pros::Motor motor19(19);
+  pros::Motor motor20(20);
+  motor7.set_voltage_limit(11000);
+  motor8.set_voltage_limit(11000);
+  motor19.set_voltage_limit(11000);
+  motor20.set_voltage_limit(11000);
   // global::outtaker.set_voltage_limit(11000);
 
    while (true) {
@@ -312,19 +312,22 @@ void opcontrol() {
     int hue = global::color.get_hue();		//get value of color sensor constantly
 
     // Use flipped arcade control - this swaps X and Y automatically
-    chassis.opcontrol_tank();
+    chassis.opcontrol_arcade_standard(ez::SPLIT);
 
     //intake control
     if(master.get_digital_new_press(DIGITAL_R1)) { //makes it intake upward and out
       global::bottom.move_velocity(200);
       global::middle.move_velocity(200);
       global::sorter.retract();
+      master.rumble(".");
     }
 
     if(master.get_digital_new_press(DIGITAL_R2)) { //makes it intake into the basket
       global::middle.move_velocity(200);
       global::bottom.move_velocity(200);
+      global::top.move_velocity(200);
       global::sorter.extend();
+      master.rumble("-");
     }
     
     if(master.get_digital_new_press(DIGITAL_A)) { //stops all outtaking and intaking systems
@@ -357,20 +360,20 @@ if(master.get_digital_new_press(DIGITAL_L1)) {
 	// 	}
 	// }
 	// else if(!color_sort) {
-		global::top.move_velocity(200);		//normal without color sorting
+		global::top.move_velocity(200);		//normal top without color sorting
     global::bottom.move_velocity(200);
 	// }
 }
 
       if(master.get_digital_new_press(DIGITAL_L2)) { //middle goal outtake
-        global::top.move_velocity(-200);
-        global::bottom.move_velocity(-200);
+        global::top.move_velocity(-100);
+        global::bottom.move_velocity(100);
       }
 
     if(master.get_digital_new_press(DIGITAL_X)) { //bottom goal
       if(!bottom) {
-        global::bottom.move_velocity(-200);
-        global::middle.move_velocity(200);
+        global::bottom.move_velocity(-100);
+        global::middle.move_velocity(100);
         bottom = true;
       }
       else if(bottom) {
@@ -417,7 +420,7 @@ if(master.get_digital_new_press(DIGITAL_L1)) {
           yes = false;
         }
         else if(!yes) {
-          chassisAuto.pid_drive_set(10_in, 100, false);
+          chassis.pid_drive_set(10_in, 100, false);
           yes = true;
         }
       }   

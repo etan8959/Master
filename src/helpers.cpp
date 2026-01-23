@@ -11,27 +11,26 @@ void brake() {
 }
 
 void upward() {
-  global::jammer.move_velocity(-200);
-  global::bottom.move_velocity(200);
-  global::middle.move_velocity(-200);
-  global::sorter.extend();
+    global::bottom.move_velocity(200);
+    global::middle.move_velocity(200);
+    global::sorter.retract();
 }
 
 void basket() {
-  global::jammer.move_velocity(200);
-  global::middle.move_velocity(200);
-  global::bottom.move_velocity(200);
-  global::sorter.retract();
+    global::top.move_velocity(200);
+    global::middle.move_velocity(200);
+    global::bottom.move_velocity(200);
+    global::sorter.extend();
 }
 
 void grounded() {
-  global::bottom.move_velocity(-200);
-  global::middle.move_velocity(200);
+    global::bottom.move_velocity(-200);
+    global::middle.move_velocity(200);
 }
 
 void middle() {
-  global::top.move_velocity(-200);
-  global::bottom.move_velocity(-200);
+    global::top.move_velocity(-100);
+    global::bottom.move_velocity(100);
 }
 
 void topp() {

@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "12/13 comp",
+    "project_name": "jointless",
     "target": "v5",
     "templates": {
       "EZ-Template": {
