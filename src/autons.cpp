@@ -380,98 +380,55 @@ void measure_offsets() {
 // . . .
 
 void right_auton() {
-static bool team_color = false;		//false is red and true is blue
-
-// if( 0 < global::color.get_hue() && global::color.get_hue() < 70) {
-// 	team_color = false;		//set color to red if it starts seeing red
-// }
-// else if(150 < global::color.get_hue() && global::color.get_hue() < 270) {
-// 	team_color = true;		// set color to blue if it starts seeing blue
-// }
-  global::jammer.move_velocity(200);
-  basket();
-  chassis.pid_drive_set(12_in, 50, false);
-  chassis.pid_wait();
-  chassis.pid_turn_relative_set(42_deg, 50, false);
-  chassis.pid_wait();
-  chassis.pid_drive_set(16_in, 80, false);
-  chassis.pid_wait();
-  pros::delay(600);
-  chassis.pid_turn_relative_set(88_deg, 70, false);
-  chassis.pid_wait();
-  pros::delay(100);
-  chassis.pid_drive_set(32_in, 80, false);
-  chassis.pid_wait();
-  chassis.pid_turn_relative_set(-129_deg, 70, false);
-  chassis.pid_wait();
-  chassis.pid_drive_set(13_in, 80, true);
-  chassis.pid_wait();
-  // chassis.pid_drive_set(-1.5_in, 70, false);
-  // chassis.pid_wait();
-  global::jammer.move_velocity(-200);
-  upward();
-  topp();
-  // pros::delay(3000);
-  // chassis.pid_drive_set(-10_in, 80, false);
-  // chassis.pid_wait();
-  // chassis.pid_turn_relative_set(-90_deg, 70, false);
-  // chassis.pid_wait();
-  // chassis.pid_drive_set(11_in, 80, false);
-  // chassis.pid_wait();
-  // chassis.pid_turn_relative_set(90_deg, 70, false);
-  // chassis.pid_wait();
-  // chassis.pid_drive_set(38_in, 50, true);
-  // chassis.pid_wait();
-  pros::delay(10000000);
+chassis.pid_drive_set(12_in, 80, false);
+chassis.pid_wait();
+chassis.pid_turn_relative_set(42_deg, 80, false);
+chassis.pid_wait();
+intake();
+chassis.pid_drive_set(24_in, 80, false);
+chassis.pid_wait();
+chassis.pid_turn_relative_set(-90_deg, 80, false);
+chassis.pid_wait();
+chassis.pid_drive_set(12_in, 80, false); 
+chassis.pid_wait();
+outtake();
+chassis.pid_drive_set(-40_in, 80, false);
+chassis.pid_wait();
+chassis.pid_turn_relative_set(-42_deg, 80, false);
+chassis.pid_wait();
+global::match_loader.extend();
+intake();
+chassis.pid_drive_set(-24_in, 80, false);
+chassis.pid_wait();
+pros::delay(1000);
+chassis.pid_drive_set(40_in, 80, false);
+chassis.pid_wait();
+eject();
 }
 
 void left_auton() {
-static bool team_color = false;		//false is red and true is blue
-
-// if( 0 < global::color.get_hue() && global::color.get_hue() < 70) {
-// 	team_color = false;		//set color to red if it starts seeing red
-// }
-// else if(150 < global::color.get_hue() && global::color.get_hue() < 270) {
-// 	team_color = true;		// set color to blue if it starts seeing blue
-// }
-
-  basket();
-  global::jammer.move_velocity(200);
-  chassis.pid_drive_set(12_in, 50, false);
-  chassis.pid_wait();
-  chassis.pid_turn_relative_set(-42_deg, 50, false);
-  chassis.pid_wait();
-  chassis.pid_drive_set(16_in, 60, false);
-  chassis.pid_wait();
-  pros::delay(600);
-  chassis.pid_turn_relative_set(-88_deg, 70, false);
-  chassis.pid_wait();
-  pros::delay(100);
-  chassis.pid_drive_set(32_in, 70, false);
-  chassis.pid_wait();
-  chassis.pid_turn_relative_set(129_deg, 70, false);
-  chassis.pid_wait();
-  chassis.pid_drive_set(13_in, 70, true);
-  chassis.pid_wait();
-  global::jammer.move_velocity(-200);
-  upward();
-  topp();
-  // pros::delay(3000);
-  // chassis.pid_drive_set(-10_in, 80, false);
-  // chassis.pid_wait();
-  // chassis.pid_turn_relative_set(-90_deg, 70, false);
-  // chassis.pid_wait();
-  // chassis.pid_drive_set(9_in, 80, false);
-  // chassis.pid_wait();
-  // chassis.pid_turn_relative_set(90_deg, 70, false);
-  // chassis.pid_wait();
-  // chassis.pid_drive_set(38_in, 50, true);
-  // chassis.pid_wait();
-  pros::delay(10000000);
-}
-
-void forwards() {
-  chassis.pid_drive_set(10_in, 100, false);
-  chassis.pid_wait();
-  pros::delay(10000000);
+chassis.pid_drive_set(12_in, 80, false);
+chassis.pid_wait();
+chassis.pid_turn_relative_set(42_deg, 80, false);
+chassis.pid_wait();
+intake();
+chassis.pid_drive_set(24_in, 80, false);
+chassis.pid_wait();
+chassis.pid_turn_relative_set(-90_deg, 80, false);
+chassis.pid_wait();
+chassis.pid_drive_set(12_in, 80, false); 
+chassis.pid_wait();
+eject_middle();
+chassis.pid_drive_set(-40_in, 80, false);
+chassis.pid_wait();
+chassis.pid_turn_relative_set(-42_deg, 80, false);
+chassis.pid_wait();
+global::match_loader.extend();
+intake();
+chassis.pid_drive_set(-24_in, 80, false);
+chassis.pid_wait();
+pros::delay(1000);
+chassis.pid_drive_set(40_in, 80, false);
+chassis.pid_wait();
+eject();
 }

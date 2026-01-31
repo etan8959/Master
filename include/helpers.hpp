@@ -1,10 +1,8 @@
 #include "main.h"
 //void functionName();
 
-void brake();
-void upward();
-void basket();
-void uptaker();
-void grounded();
-void middle();
-void topp();
+void stop_all();
+void eject();
+void eject_middle();
+void intake();
+void outtake();

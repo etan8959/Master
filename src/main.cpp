@@ -8,8 +8,8 @@
 // Chassis constructor
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
-    {-19, -20},     // Left Chassis Ports (negative port will reverse it!)
-    {7, 8},  // Right Chassis Ports (negative port will reverse it!)
+    {-18, -19, -20},     // Left Chassis Ports (negative port will reverse it!)
+    {-8, 9, 10},  // Right Chassis Ports (negative port will reverse it!)
 
     10,      // IMU Port
     3.5,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
@@ -63,7 +63,6 @@ void initialize() {
   ez::as::auton_selector.autons_add({
       Auton{"left side auton, 4 blocks", left_auton},
       Auton{"right side auton, 4 blocks", right_auton},
-      Auton{"forward 5 inches", forwards},
       // {"Drive and Turn\n\nSlow down during drive", wait_until_change_speed},
       // {"Swing Turn\n\nSwing in an 'S' curve", swing_example},
       // {"Motion Chaining\n\nDrive forward, turn, and come back, but blend everything together :D", motion_chaining},
@@ -288,142 +287,78 @@ void ez_template_extras() {
 void opcontrol() {
   // This is preference to what you like to drive on
   chassis.drive_brake_set(MOTOR_BRAKE_HOLD);
-  static bool outtaking = true;
-  static bool jam = true;
-  static bool bottom = false;
-  static bool outting = false;
-  static bool color_sort = false;		//toggle variable for color sorting mode
-  bool yes = false;
 
   //changing voltage to have motors synced
-  pros::Motor motor7(7);
-  pros::Motor motor8(8);
-  pros::Motor motor19(19);
-  pros::Motor motor20(20);
-  motor7.set_voltage_limit(11000);
-  motor8.set_voltage_limit(11000);
-  motor19.set_voltage_limit(11000);
-  motor20.set_voltage_limit(11000);
-  // global::outtaker.set_voltage_limit(11000);
 
    while (true) {
     ez_template_extras();
 
-    int hue = global::color.get_hue();		//get value of color sensor constantly
+// ------------------------- SCORING MECHANISMS -------------------------
 
-    // Use flipped arcade control - this swaps X and Y automatically
-    chassis.opcontrol_arcade_standard(ez::SPLIT);
-
-    //intake control
-    if(master.get_digital_new_press(DIGITAL_R1)) { //makes it intake upward and out
+    if(master.get_digital_new_press(DIGITAL_R2)) { //intake in
       global::bottom.move_velocity(200);
-      global::middle.move_velocity(200);
-      global::sorter.retract();
-      master.rumble(".");
     }
 
-    if(master.get_digital_new_press(DIGITAL_R2)) { //makes it intake into the basket
-      global::middle.move_velocity(200);
-      global::bottom.move_velocity(200);
-      global::top.move_velocity(200);
-      global::sorter.extend();
-      master.rumble("-");
+    if(master.get_digital(DIGITAL_R1)) { //eject with stick
+      global::stick.move_velocity(100);
+      }
+      else if(!master.get_digital(DIGITAL_L1) && !master.get_digital(DIGITAL_R1)) { //hold function
+        global::stick.brake();
+      }
+
+    if(master.get_digital(DIGITAL_L1)) { //put stick back
+      global::stick.move_velocity(-100);
     }
-    
-    if(master.get_digital_new_press(DIGITAL_A)) { //stops all outtaking and intaking systems
+      else if(!master.get_digital(DIGITAL_L1) && !master.get_digital(DIGITAL_R1)) { //hold function
+        global::stick.brake();
+      }
+
+    if(master.get_digital_new_press(DIGITAL_X)) { //top score
+      global::rightUp.extend();
+      global::leftUp.extend();
+    }
+
+    if(master.get_digital_new_press(DIGITAL_B)) { //middle score
+      global::rightUp.retract();
+      global::leftUp.retract();
+    }
+
+    if(master.get_digital_new_press(DIGITAL_DOWN)) { //intake out
+      global::rightUp.retract();
+      global::leftUp.retract();
+      global::stick.move_velocity(50);
+      pros::delay(1000);
+      global::stick.move_velocity(-100);
+      pros::delay(600);
+      global::stick.brake();
+    }
+
+    if(master.get_digital_new_press(DIGITAL_UP)) { //eject out of bottom
+      global::bottom.move_velocity(-200);
+    }
+
+// ------------------------- MISCELLANEOUS CONTROLS -------------------------
+
+    if(master.get_digital_new_press(DIGITAL_A)) { //stop all motors
       global::bottom.brake();
-      global::middle.brake();
-      global::top.brake();
-      outtaking = false;
-      bottom = false;
+      global::stick.brake();
     }
 
-//   if(master.get_digital_new_press(DIGITAL_LEFT)) {	//toggling color sort
-// 	color_sort = !color_sort;
-// }
-
-if(master.get_digital_new_press(DIGITAL_L1)) {
-	// if(team_color && color_sort) {			//if color sort is on and color is blue
-	// 	if(150 < hue && hue < 270) {
-	// 		global::top.move_velocity(-200);	//if color detected is blue then top goal
-	// 	}
-	// 	else if(0 < hue && hue < 70) {
-	// 		global::top.move_velocity(200);	//if color detected is red then middle goal
-	// 	}
-	// }
-	// else if(!team_color && color_sort) {		//if color sort is on and color is red
-	// 	if(0 < hue && hue < 70) {
-	// 		global::top.move_velocity(-200);	//if color detected is red then top goal
-	// 	}
-	// 	else if(150 < hue && hue < 270) {
-	// 		global::top.move_velocity(200);	//if color detected is blue then middle goal
-	// 	}
-	// }
-	// else if(!color_sort) {
-		global::top.move_velocity(200);		//normal top without color sorting
-    global::bottom.move_velocity(200);
-	// }
-}
-
-      if(master.get_digital_new_press(DIGITAL_L2)) { //middle goal outtake
-        global::top.move_velocity(-100);
-        global::bottom.move_velocity(100);
-      }
-
-    if(master.get_digital_new_press(DIGITAL_X)) { //bottom goal
-      if(!bottom) {
-        global::bottom.move_velocity(-100);
-        global::middle.move_velocity(100);
-        bottom = true;
-      }
-      else if(bottom) {
-        global::bottom.brake();
-        global::middle.brake();
-        bottom = false;
-      }
-    }
-
-
-    if(master.get_digital_new_press(DIGITAL_UP)) { //toggle function for anti-jammer
-      if(jam) {
-        global::jammer.move_velocity(200); //stay in basket
-        jam = false;
-      }
-      else if(!jam) {
-        global::jammer.move_velocity(-200); //out of basket
-        jam = true;
-      }
-    }
-    
-    if(master.get_digital_new_press(DIGITAL_DOWN)) { //stop the anti-jammer
-      global::jammer.brake();
+    if(master.get_digital_new_press(DIGITAL_Y)) { //match loader
+      global::match_loader.toggle();
     }
 
     if(master.get_digital_new_press(DIGITAL_LEFT)) { //descorer
       global::descorer.toggle();
     }
 
-    if(master.get_digital_new_press(DIGITAL_Y)) { //toggle match loader pneumatics
-      global::match_loader.toggle();
-    }
-  //AUTON
-    
-      if(master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_LEFT)) {
-        left_auton();
-      }
-      if(master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_RIGHT)) {
-        right_auton();
-      }
-      if(master.get_digital_new_press(DIGITAL_B) && master.get_digital_new_press(DIGITAL_DOWN)) {
-        if(yes) {
-          chassisAuto.pid_drive_set(10_in, 100, false);
-          yes = false;
-        }
-        else if(!yes) {
-          chassis.pid_drive_set(10_in, 100, false);
-          yes = true;
-        }
-      }   
-  }
+// ------------------------- AUTON TESTING -------------------------
 
+    if(master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_LEFT)) {
+      left_auton();
+    }
+    if(master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_RIGHT)) {
+      right_auton();
+    }
+  }
 }

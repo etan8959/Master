@@ -6,14 +6,10 @@ namespace global{
 //extern pros::adi::Pneumatics pneumaticsName;
 
 extern pros::Motor bottom;
-extern pros::Motor middle;
-extern pros::Motor top;
-extern pros::Motor jammer;
-
-extern pros::adi::Pneumatics sorter;
+extern pros::Motor stick;
+extern pros::adi::Pneumatics leftUp;
+extern pros::adi::Pneumatics rightUp;
 extern pros::adi::Pneumatics descorer;
 extern pros::adi::Pneumatics match_loader;
-
-extern pros::Optical color;
 
 };

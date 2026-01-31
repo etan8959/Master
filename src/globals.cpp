@@ -5,17 +5,11 @@ namespace global{
 //pros::adi::Pneumatics pneumaticsName('portLetter', state(true/false));
 
 //intaking and outtaking systems
-pros::Motor bottom(-3, pros::v5::MotorGearset::rpm_200); //half
-pros::Motor middle(4, pros::v5::MotorGearset::rpm_200); //half
-pros::Motor top(6, pros::v5::MotorGearset::rpm_200); //half
-pros::Motor jammer(5, pros::v5::MotorGearset::rpm_200); //half
+pros::Motor bottom(1, pros::v5::MotorGearset::rpm_200); //full green
+pros::Motor stick(2, pros::v5::MotorGearset::rpm_100); //full red
 
-//pneumatics
-pros::adi::Pneumatics sorter('h', false); //starts retracted
-pros::adi::Pneumatics descorer('f', false); //starts retracted
-pros::adi::Pneumatics match_loader('g', false); //starts retracted
-
-//theory color code
-pros::Optical color(2);
-
+pros::adi::Pneumatics leftUp('a', true); //do with right
+pros::adi::Pneumatics rightUp('b', true); //do with left
+pros::adi::Pneumatics descorer('c', true); 
+pros::adi::Pneumatics match_loader('d', false);
 }
