@@ -11,5 +11,6 @@ extern pros::adi::Pneumatics leftUp;
 extern pros::adi::Pneumatics rightUp;
 extern pros::adi::Pneumatics descorer;
 extern pros::adi::Pneumatics match_loader;
+extern pros::adi::Pneumatics hood;
 
 };

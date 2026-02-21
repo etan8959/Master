@@ -9,15 +9,15 @@
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
     {-18, -19, -20},     // Left Chassis Ports (negative port will reverse it!)
-    {-8, 9, 10},  // Right Chassis Ports (negative port will reverse it!)
+    {8, 9, 10},  // Right Chassis Ports (negative port will reverse it!)
 
-    10,      // IMU Port
+    11,      // IMU Port
     3.5,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
-    483);   // Wheel RPM = cartridge * (motor gear / wheel gear)
+    450);   // Wheel RPM = cartridge * (motor gear / wheel gear)
 
     static bool team_color = false; // false is red, true is blue
 
-ez::Drive chassisAuto({11, -12, 13}, {-18, 19, 20},  14, 3.5, 483);
+// ez::Drive chassisAuto({11, -12, 13}, {-18, 19, 20},  14, 3.5, 483);
 // Uncomment the trackers  you're using here!
 // - `8` and `9` are smart ports (making these negative will reverse the sensor)
 //  - you should get positive values on the encoders going FORWARD and RIGHT
@@ -48,7 +48,7 @@ void initialize() {
   // chassis.odom_tracker_left_set(&vert_tracker);
 
   // Configure your chassis controls
-  chassis.opcontrol_curve_buttons_toggle(true);   // Enables modifying the controller curve with buttons on the joysticks
+  chassis.opcontrol_curve_buttons_toggle(false);   // Enables modifying the controller curve with buttons on the joysticks
   chassis.opcontrol_drive_activebrake_set(2.0);   // Sets the active brake kP. We recommend ~2.  0 will disable.
   chassis.opcontrol_curve_default_set(0.0, 0.0); // Defaults for curve. If using tank, only the first parameter is used. (Comment this line out if you have an SD card!)
 
@@ -61,8 +61,13 @@ void initialize() {
 
   // Autonomous Selector using LLEMU
   ez::as::auton_selector.autons_add({
-      Auton{"left side auton, 4 blocks", left_auton},
-      Auton{"right side auton, 4 blocks", right_auton},
+      Auton{"right side auton, 7 blocks", right_auton},
+      Auton{"left side auton, 7 blocks", left_auton},
+      Auton{"left side auton rush, 4 blocks control zone cluster", rush_autonl},
+      Auton{"right side auton rush, 4 blocks control zone cluster", rush_autonr},
+      Auton{"left side auton rush, 4 block control zone match load", rushautonl2},
+      Auton{"drive forward 1 in", forwards},
+      Auton{"absolutely nothing", nothing},
       // {"Drive and Turn\n\nSlow down during drive", wait_until_change_speed},
       // {"Swing Turn\n\nSwing in an 'S' curve", swing_example},
       // {"Motion Chaining\n\nDrive forward, turn, and come back, but blend everything together :D", motion_chaining},
@@ -116,11 +121,11 @@ void competition_initialize() {
  * from where it left off.
  */
 void autonomous() {
-  chassisAuto.pid_targets_reset();                // Resets PID targets to 0
-  chassisAuto.drive_imu_reset();                  // Reset gyro position to 0
-  chassisAuto.drive_sensor_reset();               // Reset drive sensors to 0
-  chassisAuto.odom_xyt_set(0_in, 0_in, 0_deg);    // Set the current position, you can start at a specific position with this
-  chassisAuto.drive_brake_set(MOTOR_BRAKE_HOLD);  // Set motors to hold.  This helps autonomous consistency
+  // chassisAuto.pid_targets_reset();                // Resets PID targets to 0
+  // chassisAuto.drive_imu_reset();                  // Reset gyro position to 0
+  // chassisAuto.drive_sensor_reset();               // Reset drive sensors to 0
+  // chassisAuto.odom_xyt_set(0_in, 0_in, 0_deg);    // Set the current position, you can start at a specific position with this
+  // chassisAuto.drive_brake_set(MOTOR_BRAKE_HOLD);  // Set motors to hold.  This helps autonomous consistency
   chassis.pid_targets_reset();
   chassis.drive_imu_reset();
   chassis.drive_sensor_reset();
@@ -286,55 +291,91 @@ void ez_template_extras() {
 
 void opcontrol() {
   // This is preference to what you like to drive on
-  chassis.drive_brake_set(MOTOR_BRAKE_HOLD);
+  chassis.drive_brake_set(MOTOR_BRAKE_COAST);
+
+  //variables for op control
+  int timer = pros::millis();
 
   //changing voltage to have motors synced
+  pros::Motor motor8(8);
+  pros::Motor motor9(9);
+  pros::Motor motor10(10);
+  pros::Motor motor18(18);
+  pros::Motor motor19(19);
+  pros::Motor motor20(20);
+  motor8.set_voltage_limit(12000);
+  motor9.set_voltage_limit(12000);
+  motor10.set_voltage_limit(12000);
+  motor18.set_voltage_limit(12000);
+  motor19.set_voltage_limit(12000);
+  motor20.set_voltage_limit(12000);
 
    while (true) {
+
     ez_template_extras();
+    chassis.opcontrol_arcade_standard(ez::SPLIT);
 
 // ------------------------- SCORING MECHANISMS -------------------------
 
     if(master.get_digital_new_press(DIGITAL_R2)) { //intake in
+      global::hood.extend();
       global::bottom.move_velocity(200);
+      if(master.get_digital(DIGITAL_R2)) {
+        global::bottom.brake();
+      }
     }
 
-    if(master.get_digital(DIGITAL_R1)) { //eject with stick
-      global::stick.move_velocity(100);
-      }
-      else if(!master.get_digital(DIGITAL_L1) && !master.get_digital(DIGITAL_R1)) { //hold function
-        global::stick.brake();
-      }
 
-    if(master.get_digital(DIGITAL_L1)) { //put stick back
-      global::stick.move_velocity(-100);
+    // if(master.get_digital(DIGITAL_R1)) { //eject with stick
+    //   global::stick.move_velocity(100);
+    //   }
+    //   else if(!master.get_digital(DIGITAL_L1) && !master.get_digital(DIGITAL_R1)) { //hold function
+    //     global::stick.brake();
+    //   }
+    // if(master.get_digital(DIGITAL_L1)) { //put stick back
+    //   global::stick.move_velocity(-100);
+    // }
+    //   else if(!master.get_digital(DIGITAL_L1) && !master.get_digital(DIGITAL_R1)) { //hold function
+    //     global::stick.brake();
+    //   }
+    
+    if(master.get_digital_new_press(DIGITAL_X)) { //top score pnuematics
+      global::rightUp.retract();
+      global::leftUp.retract();
     }
-      else if(!master.get_digital(DIGITAL_L1) && !master.get_digital(DIGITAL_R1)) { //hold function
-        global::stick.brake();
-      }
 
-    if(master.get_digital_new_press(DIGITAL_X)) { //top score
+    if(master.get_digital_new_press(DIGITAL_B)) { //middle score pnuematics
       global::rightUp.extend();
       global::leftUp.extend();
     }
 
-    if(master.get_digital_new_press(DIGITAL_B)) { //middle score
-      global::rightUp.retract();
-      global::leftUp.retract();
+    if(master.get_digital_new_press(DIGITAL_UP)) { //eject out of bottom
+      global::bottom.move_velocity(-200);
     }
 
-    if(master.get_digital_new_press(DIGITAL_DOWN)) { //intake out
-      global::rightUp.retract();
+      // ------------------------- MACROS -------------------------
+
+    if(master.get_digital_new_press(DIGITAL_R1)) { //top score
       global::leftUp.retract();
-      global::stick.move_velocity(50);
+      global::rightUp.retract();
+      global::hood.retract();
+      global::stick.move_velocity(85);
+      pros::delay(600);
+      global::stick.move_velocity(-100);
+      pros::delay(600);
+      global::stick.brake();
+      global::hood.extend();
+    }
+
+    if(master.get_digital_new_press(DIGITAL_DOWN)) { //middle score macro
+      global::hood.retract();
+      global::rightUp.extend();
+      global::leftUp.extend();
+      global::stick.move_velocity(40);
       pros::delay(1000);
       global::stick.move_velocity(-100);
       pros::delay(600);
       global::stick.brake();
-    }
-
-    if(master.get_digital_new_press(DIGITAL_UP)) { //eject out of bottom
-      global::bottom.move_velocity(-200);
     }
 
 // ------------------------- MISCELLANEOUS CONTROLS -------------------------
@@ -352,13 +393,20 @@ void opcontrol() {
       global::descorer.toggle();
     }
 
+    if(master.get_digital_new_press(DIGITAL_L2)) { 
+      global::hood.toggle();
+    }
+
 // ------------------------- AUTON TESTING -------------------------
 
+    if(master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_RIGHT)) {
+      right_auton();
+    }
     if(master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_LEFT)) {
       left_auton();
     }
-    if(master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_RIGHT)) {
-      right_auton();
+    if(master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_A)) {
+      forwards();
     }
   }
 }

@@ -15,12 +15,13 @@ const int SWING_SPEED = 100;
 ///
 void default_constants() {
   // P, I, D, and Start I
-  chassis.pid_drive_constants_set(20.0, 0.0, 100.0);
-  chassis.pid_turn_constants_set(3.0, 0.05, 20.0, 15.0);   // Fwd/rev constants, start with proportional and derivative
-  chassis.pid_heading_constants_set(11.0, 0.0, 20.0);          // Holds robot straight while driving
-  chassis.pid_swing_constants_set(4.0, 0.0, 45.0);           // Swing constants, start medium tune
-  chassis.pid_odom_angular_constants_set(4.0, 0.0, 40.0);    // Angular control for odometry motions
-  chassis.pid_odom_boomerang_constants_set(4.0, 0.0, 25.0);  // Angular control for boomerang motions
+  chassis.pid_drive_constants_forward_set(12.0, 0.0, 60.0);
+  chassis.pid_drive_constants_backward_set(13.5, 0.0, 60.0);
+  chassis.pid_heading_constants_set(10.0, 0, 24.0);        // Holds the robot straight while going forward without odom (7.5, 0, 33.00)
+  chassis.pid_turn_constants_set(3, 0.11, 20.25, 17.0);     // Turn in place constants (3.3, 0.115, 17.20, 15.0)
+  chassis.pid_swing_constants_set(6.0, 0.0, 65.0);           // Swing constants
+  chassis.pid_odom_angular_constants_set(6.5, 0.0, 53.0);    // Angular control for odom motions
+  chassis.pid_odom_boomerang_constants_set(5.8, 0.0, 32.5);
 
   // Exit conditions
   chassis.pid_turn_exit_condition_set(90_ms, 3_deg, 250_ms, 7_deg, 500_ms, 500_ms);
@@ -379,56 +380,163 @@ void measure_offsets() {
 // Make your own autonomous functions here!
 // . . .
 
+void rush_autonl() {
+  chassis.pid_drive_set(12_in, 80, false);
+  chassis.pid_wait();
+  chassis.pid_turn_set(-45_deg, 80, false);
+  chassis.pid_wait();
+  intake();
+  chassis.pid_drive_set(18_in, 60, false);
+  chassis.pid_wait();
+  chassis.pid_turn_set(-225_deg, 80, false);
+  chassis.pid_wait();
+  chassis.pid_drive_set(-12_in, 80, false);
+  chassis.pid_wait();
+  chassis.pid_turn_set(180_deg, 80, false);
+  chassis.pid_wait();
+  chassis.pid_drive_set(-30_in, 80, false);
+  chassis.pid_wait();
+  eject();
+  chassis.pid_drive_set(6_in, 80, false);
+  chassis.pid_wait();
+  chassis.pid_turn_set(185_deg, 80, false);
+  chassis.pid_wait();
+  chassis.pid_drive_set(-4_in, 80, false); 
+  chassis.pid_wait();
+  chassis.pid_turn_set(180_deg, 80, false);
+  chassis.pid_wait();
+  chassis.pid_drive_set(-40_in, 100, false);
+  chassis.pid_wait();
+}
+
+void rushautonl2 () {
+  chassis.pid_drive_set(32_in, 80, false);
+  chassis.pid_wait();
+  chassis.pid_turn_set(-90_deg, 80, false);
+  chassis.pid_wait();
+  intake();
+  global::match_loader.extend();
+  chassis.pid_drive_set(10_in, 80, false);
+  chassis.pid_wait();
+  pros::delay(1000);
+  chassis.pid_drive_set(-50_in, 80, false);
+  chassis.pid_wait();
+  eject();
+  stop_all();
+  chassis.pid_drive_set(10_in, 80, false);
+  chassis.pid_wait();
+  chassis.pid_turn_set(-100_deg, 80, false);
+  chassis.pid_wait();
+  chassis.pid_drive_set(-12_in, 80, false);
+  chassis.pid_wait();
+  chassis.pid_drive_set(-30_in, 80, false);
+  chassis.pid_wait();
+  chassis.pid_swing_set(ez::RIGHT_SWING, 90_deg, 80, 60);
+  chassis.pid_wait();
+}
+
+void rush_autonr() {
+
+}
+
 void right_auton() {
 chassis.pid_drive_set(12_in, 80, false);
 chassis.pid_wait();
-chassis.pid_turn_relative_set(42_deg, 80, false);
+chassis.pid_turn_relative_set(45_deg, 80, false);
 chassis.pid_wait();
 intake();
-chassis.pid_drive_set(24_in, 80, false);
+chassis.pid_drive_set(22_in, 50, false);
+chassis.pid_wait();
+pros::delay(500);
+chassis.pid_drive_set(-3_in, 100, false);
 chassis.pid_wait();
 chassis.pid_turn_relative_set(-90_deg, 80, false);
 chassis.pid_wait();
-chassis.pid_drive_set(12_in, 80, false); 
-chassis.pid_wait();
-outtake();
-chassis.pid_drive_set(-40_in, 80, false);
-chassis.pid_wait();
-chassis.pid_turn_relative_set(-42_deg, 80, false);
+chassis.pid_drive_set(24_in, 60, false);
 chassis.pid_wait();
 global::match_loader.extend();
+outtake();
+pros::delay(700);
+stop_all();
+global::match_loader.retract();
+global::leftUp.retract();
+global::rightUp.retract();
+chassis.pid_drive_set(-54_in, 90, false); 
+chassis.pid_wait();
+chassis.pid_turn_set(-180_deg, 90, false);
+global::match_loader.extend();
 intake();
-chassis.pid_drive_set(-24_in, 80, false);
+pros::delay(100);
+chassis.pid_drive_set(36_in, 100, false);
 chassis.pid_wait();
-pros::delay(1000);
-chassis.pid_drive_set(40_in, 80, false);
+chassis.pid_drive_set(-4_in, 90, false);
 chassis.pid_wait();
+chassis.pid_drive_set(4_in, 90, false);
+chassis.pid_wait();
+pros::delay(500);
+chassis.pid_drive_set(-40_in, 90, false);
+chassis.pid_wait();
+pros::delay(3000); //remove after comp
 eject();
+chassis.pid_drive_set(12_in, 90, false);
+chassis.pid_wait();
 }
 
 void left_auton() {
+global::leftUp.extend();
+global::rightUp.extend();
 chassis.pid_drive_set(12_in, 80, false);
 chassis.pid_wait();
-chassis.pid_turn_relative_set(42_deg, 80, false);
+chassis.pid_turn_relative_set(-45_deg, 80, false);
 chassis.pid_wait();
 intake();
-chassis.pid_drive_set(24_in, 80, false);
+chassis.pid_drive_set(22_in, 50, false);
+chassis.pid_wait();
+pros::delay(500);
+chassis.pid_drive_set(-3_in, 100, false);
 chassis.pid_wait();
 chassis.pid_turn_relative_set(-90_deg, 80, false);
 chassis.pid_wait();
-chassis.pid_drive_set(12_in, 80, false); 
+chassis.pid_drive_set(-20_in, 60, false);
 chassis.pid_wait();
 eject_middle();
-chassis.pid_drive_set(-40_in, 80, false);
+stop_all();
+global::leftUp.retract();
+global::rightUp.retract();
+chassis.pid_drive_set(54_in, 90, false); 
 chassis.pid_wait();
-chassis.pid_turn_relative_set(-42_deg, 80, false);
-chassis.pid_wait();
+chassis.pid_turn_set(-180_deg, 90, false);
 global::match_loader.extend();
 intake();
-chassis.pid_drive_set(-24_in, 80, false);
+pros::delay(500);
+chassis.pid_drive_set(36_in, 100, false);
 chassis.pid_wait();
-pros::delay(1000);
-chassis.pid_drive_set(40_in, 80, false);
+pros::delay(100);
+chassis.pid_drive_set(-4_in, 90, false);
 chassis.pid_wait();
+chassis.pid_drive_set(4_in, 90, false);
+chassis.pid_wait();
+chassis.pid_drive_set(-4_in, 90, false);
+chassis.pid_wait();
+chassis.pid_drive_set(4_in, 90, false);
+chassis.pid_wait();
+chassis.pid_drive_set(-4_in, 90, false);
+chassis.pid_wait();
+chassis.pid_turn_set(-180_deg, 90, false);
+chassis.pid_wait();
+chassis.pid_drive_set(-46_in, 90, false);
+chassis.pid_wait();
+pros::delay(3000); //remove after comp
 eject();
+chassis.pid_drive_set(12_in, 90, false);
+chassis.pid_wait();
+}
+
+void forwards() {
+  chassis.pid_drive_set(5_in, 80, false);
+  chassis.pid_wait();
+}
+
+void nothing() {
+  global::stick.brake();
 }
