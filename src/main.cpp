@@ -295,6 +295,7 @@ void opcontrol() {
 
   //variables for op control
   int timer = pros::millis();
+  static bool intaking = false;
 
   //changing voltage to have motors synced
   pros::Motor motor8(8);
@@ -303,12 +304,12 @@ void opcontrol() {
   pros::Motor motor18(18);
   pros::Motor motor19(19);
   pros::Motor motor20(20);
-  motor8.set_voltage_limit(12000);
-  motor9.set_voltage_limit(12000);
-  motor10.set_voltage_limit(12000);
-  motor18.set_voltage_limit(12000);
-  motor19.set_voltage_limit(12000);
-  motor20.set_voltage_limit(12000);
+  motor8.set_voltage_limit(11000);
+  motor9.set_voltage_limit(11000);
+  motor10.set_voltage_limit(11000);
+  motor18.set_voltage_limit(11000);
+  motor19.set_voltage_limit(11000);
+  motor20.set_voltage_limit(11000);
 
    while (true) {
 
@@ -317,14 +318,16 @@ void opcontrol() {
 
 // ------------------------- SCORING MECHANISMS -------------------------
 
-    if(master.get_digital_new_press(DIGITAL_R2)) { //intake in
-      global::hood.extend();
-      global::bottom.move_velocity(200);
-      if(master.get_digital(DIGITAL_R2)) {
-        global::bottom.brake();
+    if(master.get_digital_new_press(DIGITAL_R2)) { //toggle function for intaking
+      if(intaking) {
+        global::bottom.move_velocity(200); //on
+        intaking = false;
+      }
+      else if(!intaking) {
+        global::bottom.brake(); //off
+        intaking = true;
       }
     }
-
 
     // if(master.get_digital(DIGITAL_R1)) { //eject with stick
     //   global::stick.move_velocity(100);
@@ -389,13 +392,17 @@ void opcontrol() {
       global::match_loader.toggle();
     }
 
-    if(master.get_digital_new_press(DIGITAL_LEFT)) { //descorer
-      global::descorer.toggle();
+    if(master.get_digital_new_press(DIGITAL_L2)) { //descorer hold
+      global::descorer.extend();
     }
+    
+      else if(!master.get_digital(DIGITAL_L2)) {
+        global::descorer.retract();
+      }
 
-    if(master.get_digital_new_press(DIGITAL_L2)) { 
-      global::hood.toggle();
-    }
+    // if(master.get_digital_new_press(DIGITAL_L2)) { 
+    //   global::hood.toggle();
+    // }
 
 // ------------------------- AUTON TESTING -------------------------
 
@@ -408,5 +415,67 @@ void opcontrol() {
     if(master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_A)) {
       forwards();
     }
+
+// ------------------------- baby controls -------------------------
+
+    // if(master.get_digital_new_press(DIGITAL_R1)) {
+    //   global::leftUp.retract();
+    //   global::rightUp.retract();
+    //   global::hood.retract();
+    //   global::stick.move_velocity(85);
+    //   pros::delay(600);
+    //   global::stick.move_velocity(-100);
+    //   pros::delay(600);
+    //   global::stick.brake();
+    //   global::hood.extend();
+    // }
+
+    // if(master.get_digital_new_press(DIGITAL_R2)) {
+    //   if(intaking) {
+    //     global::bottom.move_velocity(200); //on
+    //     intaking = false;
+    //   }
+    //   else if(!intaking) {
+    //     global::bottom.brake(); //off
+    //     intaking = true;
+    //   }
+    // }
+
+    // if(master.get_digital_new_press(DIGITAL_X)) {
+    //  global::match_loader.toggle();
+    // }
+
+    // if(master.get_digital_new_press(DIGITAL_L1)) {
+    //   global::hood.retract();
+    //   global::rightUp.extend();
+    //   global::leftUp.extend();
+    //   global::stick.move_velocity(40);
+    //   pros::delay(1000);
+    //   global::stick.move_velocity(-100);
+    //   pros::delay(600);
+    //   global::stick.brake();
+    // }
+
+    // if(master.get_digital_new_press(DIGITAL_L2)) {
+    //   global::descorer.toggle();
+    // }
+
+    // if(master.get_digital_new_press(DIGITAL_A)) {
+    //   global::bottom.move_velocity(-200);
+    // }
+
+    // if(master.get_digital_new_press(DIGITAL_B)) {
+    //   global::leftUp.toggle();
+    //   global::rightUp.toggle();
+    // }
+
+    // if(master.get_digital_new_press(DIGITAL_Y)) {
+    //   global::hood.toggle();
+    // }
+
+// ------------------------- end of baby controls -------------------------
+
+    pros::delay(ez::util::DELAY_TIME); // This is used to prevent wasted resources.  Don't remove it!
+
   }
 }

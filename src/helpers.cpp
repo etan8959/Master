@@ -9,7 +9,7 @@ void eject(){
   global::hood.retract();
   global::leftUp.retract();
   global::rightUp.retract();
-  pros::delay(1);
+  pros::delay(100);
   global::stick.move_velocity(100);
   pros::delay(700);
   global::stick.move_velocity(-100);
@@ -41,7 +41,7 @@ void intake() {
 }
 
 void outtake() {
-  global::bottom.move_velocity(-100);
+  global::bottom.move_velocity(-70);
 }
 
 void stop_all() {
